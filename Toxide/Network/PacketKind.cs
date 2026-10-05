@@ -3,8 +3,7 @@ namespace Toxide.Network;
 /// <summary>
 /// The first byte of every UDP packet identifies its kind, so the receiver knows which
 /// component (DHT, onion, net_crypto, ...) must handle it.
-/// Only the kinds needed by the layers implemented so far are listed; more will be added
-/// together with the components that use them.
+/// Group chats, TCP relays and DHT announcements (0x5a-0x5c, 0x90-0x98) are not implemented.
 /// </summary>
 public enum PacketKind : byte
 {
@@ -30,10 +29,12 @@ public enum PacketKind : byte
     OnionSendInitial = 0x80,
     OnionSend1 = 0x81,
     OnionSend2 = 0x82,
-    AnnounceRequest = 0x83,
+    AnnounceRequest = 0x83,   // "old" format, still the one toxcore clients send
     AnnounceResponse = 0x84,
     OnionDataRequest = 0x85,
     OnionDataResponse = 0x86,
+    AnnounceRequestNew = 0x87, // same request; the response carries an explicit node count
+    AnnounceResponseNew = 0x88,
     OnionReceive3 = 0x8c,
     OnionReceive2 = 0x8d,
     OnionReceive1 = 0x8e,

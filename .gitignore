@@ -55,3 +55,10 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# toxcore interop harness (scripts/build-toxpeer.sh)
+.toxpeer/
+
+# IDE
+.idea/
+*.DotSettings.user

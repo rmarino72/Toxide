@@ -1,8 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toxide", "Toxide\Toxide.csproj", "{53FD0D7F-9D88-4406-838B-95E34C218F0A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{02446770-F72F-4A9C-A805-FA10D4261063}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{6124F94E-F783-4939-A460-A41EC58B54D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EchoBot", "samples\EchoBot\EchoBot.csproj", "{216E9CA0-724A-48A3-B512-046953CF64CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +23,12 @@ Global
 		{02446770-F72F-4A9C-A805-FA10D4261063}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02446770-F72F-4A9C-A805-FA10D4261063}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02446770-F72F-4A9C-A805-FA10D4261063}.Release|Any CPU.Build.0 = Release|Any CPU
+		{216E9CA0-724A-48A3-B512-046953CF64CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{216E9CA0-724A-48A3-B512-046953CF64CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{216E9CA0-724A-48A3-B512-046953CF64CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{216E9CA0-724A-48A3-B512-046953CF64CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{216E9CA0-724A-48A3-B512-046953CF64CC} = {6124F94E-F783-4939-A460-A41EC58B54D5}
 	EndGlobalSection
 EndGlobal

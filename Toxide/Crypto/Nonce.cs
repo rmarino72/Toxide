@@ -25,4 +25,16 @@ public static class Nonce
                 break; // no carry: done
         }
     }
+
+    /// <summary>Adds <paramref name="value"/> to the nonce, big-endian (toxcore's increment_nonce_number).</summary>
+    public static void Add(Span<byte> nonce, uint value)
+    {
+        uint carry = value;
+        for (int i = nonce.Length - 1; i >= 0 && carry != 0; i--)
+        {
+            uint sum = nonce[i] + (carry & 0xFF);
+            nonce[i] = (byte)sum;
+            carry = (carry >> 8) + (sum >> 8);
+        }
+    }
 }

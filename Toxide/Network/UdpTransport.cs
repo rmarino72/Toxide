@@ -10,8 +10,10 @@ namespace Toxide.Network;
 ///  - Dual-stack when possible: a single IPv6 socket that also talks to IPv4 peers.
 ///  - A background loop receives datagrams and queues them in <see cref="Incoming"/>;
 ///    the queue is bounded and drops new packets when full, as an overloaded kernel buffer would.
+///  - Implements <see cref="IPacketSender"/> with a synchronous send: UDP sends do not block, and
+///    protocol code running on the event loop must not await.
 /// </summary>
-public sealed class UdpTransport : IAsyncDisposable
+public sealed class UdpTransport : IPacketSender, IAsyncDisposable
 {
     public const int MaxPacketSize = 2048;
     public const ushort DefaultPortStart = 33445;
@@ -45,16 +47,19 @@ public sealed class UdpTransport : IAsyncDisposable
         _receiveLoop = Task.Run(ReceiveLoopAsync);
     }
 
-    /// <summary>Binds the first available port in [portStart, portEnd]. Use 0, 0 to let the OS choose.</summary>
+    /// <summary>
+    /// Binds the first available port in [portStart, portEnd]. Use 0, 0 to let the OS choose.
+    /// With <paramref name="ipv6"/> false the socket is IPv4-only.
+    /// </summary>
     public static UdpTransport Bind(ushort portStart = DefaultPortStart, ushort portEnd = DefaultPortEnd,
-        int queueCapacity = 1024)
+        int queueCapacity = 1024, bool ipv6 = true)
     {
         if (portEnd < portStart)
             throw new ArgumentException("portEnd must be >= portStart.", nameof(portEnd));
 
         for (int port = portStart; port <= portEnd; port++)
         {
-            var socket = CreateSocket();
+            var socket = CreateSocket(ipv6);
             try
             {
                 var any = socket.AddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any;
@@ -94,6 +99,28 @@ public sealed class UdpTransport : IAsyncDisposable
         }
     }
 
+    public bool CanReach(IpPort destination) =>
+        destination.IsIPv4 || _socket.AddressFamily == AddressFamily.InterNetworkV6;
+
+    public bool Send(IpPort destination, ReadOnlySpan<byte> packet)
+    {
+        if (packet.Length is 0 or > MaxPacketSize || !CanReach(destination))
+            return false;
+
+        try
+        {
+            return _socket.SendTo(packet, SocketFlags.None, destination.ToEndPoint()) == packet.Length;
+        }
+        catch (SocketException)
+        {
+            return false; // e.g. network unreachable, broadcast not permitted
+        }
+        catch (ObjectDisposedException)
+        {
+            return false;
+        }
+    }
+
     private async Task ReceiveLoopAsync()
     {
         var buffer = new byte[MaxPacketSize];
@@ -127,10 +154,10 @@ public sealed class UdpTransport : IAsyncDisposable
         _incoming.Writer.TryComplete();
     }
 
-    private static Socket CreateSocket()
+    private static Socket CreateSocket(bool ipv6)
     {
         Socket socket;
-        if (Socket.OSSupportsIPv6)
+        if (ipv6 && Socket.OSSupportsIPv6)
         {
             socket = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
             try { socket.DualMode = true; }
@@ -147,6 +174,10 @@ public sealed class UdpTransport : IAsyncDisposable
 
         if (OperatingSystem.IsWindows())
             socket.IOControl(SioUdpConnReset, new byte[4], null);
+
+        // Needed for LAN discovery; some stacks refuse it on IPv6 sockets, which only disables that feature.
+        try { socket.EnableBroadcast = true; }
+        catch (SocketException) { }
 
         return socket;
     }

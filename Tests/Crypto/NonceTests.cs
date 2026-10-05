@@ -64,4 +64,31 @@ public class NonceTests
 
         Assert.All(nonce, b => Assert.Equal(0, b));
     }
+
+    [Fact]
+    public void Add_PropagatesCarryBigEndian()
+    {
+        var nonce = new byte[24];
+        nonce[23] = 0xFF;
+        nonce[22] = 0xFF;
+
+        Nonce.Add(nonce, 2);
+
+        Assert.Equal(1, nonce[23]);
+        Assert.Equal(0, nonce[22]);
+        Assert.Equal(1, nonce[21]);
+    }
+
+    [Fact]
+    public void Add_MatchesRepeatedIncrement()
+    {
+        var a = Nonce.Random();
+        var b = (byte[])a.Clone();
+
+        Nonce.Add(a, 70_000);
+        for (int i = 0; i < 70_000; i++)
+            Nonce.Increment(b);
+
+        Assert.Equal(b, a);
+    }
 }
