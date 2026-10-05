@@ -7,11 +7,14 @@ namespace Toxide.Crypto;
 /// </summary>
 public interface ICryptoCore
 {
-    /// <summary>New Curve25519 (X25519) key pair.</summary>
+    /// <summary>New random Curve25519 (X25519) key pair.</summary>
     KeyPair GenerateKeyPair();
 
+    /// <summary>Rebuilds a key pair from an existing secret key (e.g. loaded from savedata).</summary>
+    KeyPair DeriveKeyPair(ReadOnlySpan<byte> secretKey);
+
     /// <summary>
-    /// crypto_box_beforenm: HSalsa20(X25519(secret, public)).
+    /// crypto_box_beforenm: HSalsa20(X25519(secret, public), 0^16).
     /// Computed once per peer and reused: this is the expensive operation.
     /// </summary>
     byte[] ComputeSharedKey(ReadOnlySpan<byte> theirPublicKey, ReadOnlySpan<byte> ourSecretKey);
