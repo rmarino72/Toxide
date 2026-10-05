@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toxide", "Toxide\Toxide.csproj", "{53FD0D7F-9D88-4406-838B-95E34C218F0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{02446770-F72F-4A9C-A805-FA10D4261063}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{53FD0D7F-9D88-4406-838B-95E34C218F0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53FD0D7F-9D88-4406-838B-95E34C218F0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53FD0D7F-9D88-4406-838B-95E34C218F0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53FD0D7F-9D88-4406-838B-95E34C218F0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02446770-F72F-4A9C-A805-FA10D4261063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02446770-F72F-4A9C-A805-FA10D4261063}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02446770-F72F-4A9C-A805-FA10D4261063}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02446770-F72F-4A9C-A805-FA10D4261063}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
