@@ -1,9 +1,14 @@
 name: Publish to NuGet
 
 # Push a tag like v0.1.0 (matching <Version> in Toxide.csproj) to publish.
+# Authentication uses nuget.org Trusted Publishing (OIDC): no API key is stored anywhere.
 on:
   push:
     tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write # lets the job request a short-lived nuget.org token
 
 jobs:
   publish:
@@ -21,5 +26,12 @@ jobs:
 
       - run: dotnet test -c Release
       - run: dotnet pack Toxide/Toxide.csproj -c Release -o artifacts
+
+      - name: Get a temporary nuget.org key (Trusted Publishing)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: RosarioMarino
+
       - name: Push
-        run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
