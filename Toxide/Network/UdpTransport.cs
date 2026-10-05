@@ -90,7 +90,7 @@ public sealed class UdpTransport : IPacketSender, IAsyncDisposable
 
         try
         {
-            await _socket.SendToAsync(packet, SocketFlags.None, destination.ToEndPoint(), cancellationToken);
+            await _socket.SendToAsync(packet, SocketFlags.None, destination.ToEndPoint(), cancellationToken).ConfigureAwait(false);
             return true;
         }
         catch (SocketException)
@@ -133,7 +133,7 @@ public sealed class UdpTransport : IPacketSender, IAsyncDisposable
             SocketReceiveFromResult result;
             try
             {
-                result = await _socket.ReceiveFromAsync(buffer, SocketFlags.None, anyRemote, _cts.Token);
+                result = await _socket.ReceiveFromAsync(buffer, SocketFlags.None, anyRemote, _cts.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException) { break; }
             catch (ObjectDisposedException) { break; }
@@ -186,7 +186,7 @@ public sealed class UdpTransport : IPacketSender, IAsyncDisposable
     {
         _cts.Cancel();
         _socket.Dispose();
-        try { await _receiveLoop; } catch { /* loop is shutting down */ }
+        try { await _receiveLoop.ConfigureAwait(false); } catch { /* loop is shutting down */ }
         _incoming.Writer.TryComplete();
         _cts.Dispose();
     }

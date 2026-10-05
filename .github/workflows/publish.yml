@@ -1,0 +1,25 @@
+name: Publish to NuGet
+
+# Push a tag like v0.1.0 (matching <Version> in Toxide.csproj) to publish.
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Check that the tag matches the package version
+        run: |
+          version=$(grep -oP '(?<=<Version>)[^<]+' Toxide/Toxide.csproj)
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME != v$version"; exit 1; }
+
+      - run: dotnet test -c Release
+      - run: dotnet pack Toxide/Toxide.csproj -c Release -o artifacts
+      - name: Push
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

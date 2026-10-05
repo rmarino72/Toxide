@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build c-toxcore interop harness
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsodium-dev pkg-config
+          scripts/build-toxpeer.sh
+          echo "TOXIDE_TOXPEER=$PWD/.toxpeer/toxpeer" >> "$GITHUB_ENV"
+
+      - run: dotnet build -c Release
+      - run: dotnet test -c Release --no-build --logger "console;verbosity=normal"
+      - run: dotnet pack Toxide/Toxide.csproj -c Release --no-build -o artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: artifacts/*

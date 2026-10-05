@@ -42,7 +42,7 @@ public sealed class EventLoop
             wait.CancelAfter(_tickInterval);
             try
             {
-                if (!await _incoming.WaitToReadAsync(wait.Token))
+                if (!await _incoming.WaitToReadAsync(wait.Token).ConfigureAwait(false))
                     return; // transport closed
             }
             catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)

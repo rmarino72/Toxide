@@ -121,4 +121,17 @@ public class SaveDataTests
         Assert.Equal(plain, ToxEncryptSave.Decrypt(encrypted, "s3cret"));
         Assert.Throws<CryptographicException>(() => ToxEncryptSave.Decrypt(encrypted, "wrong"));
     }
+
+    [Fact]
+    public void PassKey_IsCompatibleWithPassphraseFunctions()
+    {
+        using var key = ToxPassKey.Derive("s3cret");
+        var blob = key.Encrypt("hello"u8);
+
+        Assert.Equal(key.Salt, ToxPassKey.GetSalt(blob));
+        Assert.Equal("hello"u8.ToArray(), ToxEncryptSave.Decrypt(blob, "s3cret"));
+        using var again = ToxPassKey.Derive("s3cret", ToxPassKey.GetSalt(blob)!);
+        Assert.Equal("hello"u8.ToArray(), again.Decrypt(blob));
+        Assert.Throws<System.Security.Cryptography.CryptographicException>(() => key.Decrypt(ToxEncryptSave.Encrypt("x"u8, "s3cret")));
+    }
 }
